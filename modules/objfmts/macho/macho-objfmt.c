@@ -103,6 +103,8 @@
 #define MACHO_NLIST_SIZE        12
 #define MACHO_RELINFO_SIZE      8
 
+#define MACHO_MIN_VERSION_SIZE  16
+
 /* 64 bit sizes */
 #define MACHO_HEADER64_SIZE     32
 #define MACHO_SEGCMD64_SIZE     72
@@ -1062,7 +1064,7 @@ macho_objfmt_output(yasm_object *object, FILE *f, int all_syms,
         headsize =
             MACHO_HEADER64_SIZE + MACHO_SEGCMD64_SIZE +
             (MACHO_SECTCMD64_SIZE * (objfmt_macho->parse_scnum)) +
-            MACHO_SYMCMD_SIZE;
+            MACHO_SYMCMD_SIZE + MACHO_MIN_VERSION_SIZE;
         macho_segcmd = LC_SEGMENT_64;
         macho_segcmdsize = MACHO_SEGCMD64_SIZE;
         macho_sectcmdsize = MACHO_SECTCMD64_SIZE;
@@ -1072,7 +1074,7 @@ macho_objfmt_output(yasm_object *object, FILE *f, int all_syms,
         headsize =
             MACHO_HEADER_SIZE + MACHO_SEGCMD_SIZE +
             (MACHO_SECTCMD_SIZE * (objfmt_macho->parse_scnum)) +
-            MACHO_SYMCMD_SIZE;
+            MACHO_SYMCMD_SIZE + MACHO_MIN_VERSION_SIZE;
         macho_segcmd = LC_SEGMENT;
         macho_segcmdsize = MACHO_SEGCMD_SIZE;
         macho_sectcmdsize = MACHO_SECTCMD_SIZE;
@@ -1149,10 +1151,10 @@ macho_objfmt_output(yasm_object *object, FILE *f, int all_syms,
     YASM_WRITE_32_L(localbuf, 0);       /* no flags (yet) */
     if (info.is_64) {
         YASM_WRITE_32_L(localbuf, 0);   /* reserved in 64 bit */
-        fileoffset = MACHO_HEADER64_SIZE + head_sizeofcmds;
+        fileoffset = MACHO_HEADER64_SIZE + head_sizeofcmds + MACHO_MIN_VERSION_SIZE;
     } else {
         /* initial offset to first section */
-        fileoffset = MACHO_HEADER_SIZE + head_sizeofcmds;
+        fileoffset = MACHO_HEADER_SIZE + head_sizeofcmds + MACHO_MIN_VERSION_SIZE;
     }
 
     /* --------------- write segment header command ---------------- */
